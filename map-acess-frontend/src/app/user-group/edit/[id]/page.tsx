@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Box, Button, TextField, Typography, CircularProgress } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useMutation, useQuery } from "react-query";
@@ -13,8 +13,7 @@ export default function EditUserGroup() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
-  const searchParams = useSearchParams();
-  const id = searchParams?.get("id");
+  const { id }: any = useParams(); 
   const token = Cookies.get("jwt") as string;
 
   const { data, isLoading: isFetching } = useQuery(
@@ -35,7 +34,7 @@ export default function EditUserGroup() {
           `Erro ao carregar o grupo: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
           { variant: "error" }
         );
-        router.push("/user-groups");
+        router.push("/user-group");
       },
     }
   );
@@ -53,7 +52,7 @@ export default function EditUserGroup() {
     {
       onSuccess: () => {
         enqueueSnackbar("Grupo atualizado com sucesso!", { variant: "success" });
-        router.push("/user-groups");
+        router.push("/user-group");
       },
       onError: (error: unknown) => {
         enqueueSnackbar(

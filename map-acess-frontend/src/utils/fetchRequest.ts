@@ -8,7 +8,6 @@ interface fetchRequestOptions<T> extends Omit<RequestInit, "body"> {
 }
 
 interface FetchResponse<U> {
-    message: string;
     statusCode: number;
     body: U;
 }
@@ -38,11 +37,17 @@ export default async function fetchRequest<T, U>(endpoint: string, options: fetc
             responseBody = await response.json();
         }
 
+        if (!response.ok) {
+            // Lança um erro com a mensagem retornada pelo backend, se disponível
+            const errorMessage = responseBody?.message || "Erro desconhecido.";
+            throw new Error(errorMessage);
+        }
+
         return {
             statusCode: response.status,
             body: responseBody as U,
         };
     } catch (error) {
-        throw new Error(`Ocorreu um erro na requisição: ${error instanceof Error ? error.message : error}`);
+        throw new Error(`Ocorreu um erro na requisição: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
     }
 }

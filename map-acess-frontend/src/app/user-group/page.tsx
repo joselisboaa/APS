@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, CardActions, CardContent, Typography, CircularProgress, Alert, Box } from "@mui/material";
+import { Button, Card, CardActions, CardContent, Typography, CircularProgress, Box } from "@mui/material";
 import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useSnackbar } from "notistack";
 import fetchRequest from "@/utils/fetchRequest";
 import Cookies from "js-cookie";
-
 
 interface UserGroup {
   id: string;
@@ -15,9 +15,8 @@ interface UserGroup {
 export default function UserGroups() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { enqueueSnackbar } = useSnackbar();
   const token = Cookies.get("jwt") as string;
-
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { data: userGroups, isLoading } = useQuery<UserGroup[]>(
     "userGroups",
@@ -32,8 +31,11 @@ export default function UserGroups() {
     },
     {
       onError: (error: unknown) => {
-        setErrorMessage(
-          `Erro ao carregar grupos: ${error instanceof Error ? error.message : "Erro desconhecido"}`
+        enqueueSnackbar(
+          `Erro ao carregar grupos: ${
+            error instanceof Error ? error.message : "Erro desconhecido"
+          }`,
+          { variant: "error" }
         );
       },
     }
@@ -52,16 +54,20 @@ export default function UserGroups() {
       onSuccess: (_, id) => {
         queryClient.setQueryData<UserGroup[]>("userGroups", (old) =>
           (old || []).filter((group) => group.id !== id)
-        );        
+        );
+        enqueueSnackbar("Grupo excluído com sucesso!", { variant: "success" });
       },
       onError: (error: unknown) => {
-        setErrorMessage(
-          `Erro ao excluir grupo: ${error instanceof Error ? error.message : "Erro desconhecido"}`
-        );
-      },
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Erro desconhecido ao excluir o grupo.";
+      
+        enqueueSnackbar(errorMessage, { variant: "error" });
+      }      
     }
   );
-
+  
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -70,7 +76,7 @@ export default function UserGroups() {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => router.push("/user-groups/new")}
+        onClick={() => router.push("/user-group/new")}
         sx={{ marginBottom: 2 }}
       >
         Criar Novo Grupo
@@ -79,11 +85,6 @@ export default function UserGroups() {
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: 2 }}>
           <CircularProgress />
         </Box>
-      )}
-      {errorMessage && (
-        <Alert severity="error" sx={{ marginBottom: 2 }}>
-          {errorMessage}
-        </Alert>
       )}
       <Box sx={{ display: "grid", gap: 2 }}>
         {userGroups?.map((group) => (
@@ -101,7 +102,7 @@ export default function UserGroups() {
               <Button
                 variant="contained"
                 color="success"
-                onClick={() => router.push(`/user-groups/edit/${group.id}`)}
+                onClick={() => router.push(`/user-group/edit/${group.id}`)}
                 sx={{ marginRight: 1 }}
               >
                 Editar
