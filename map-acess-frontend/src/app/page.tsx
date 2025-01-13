@@ -1,11 +1,13 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/navigation';
-import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Cookies from "js-cookie";
-import fetchRequest from "../utils/fetchRequest"; // ajuste o caminho conforme a localização da sua função
+import fetchRequest from "../utils/fetchRequest";
+import { useQuery } from "react-query";
+import useVerifyAuth from "@/utils/hooks/useVerifyAuth";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -13,24 +15,36 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const search = searchParams.get("code")
+  const search = searchParams?.get("code");
 
-  if(search) {
+  if (search) {
     Cookies.set("jwt", search);
     router.push("/home");
   }
 
+  const myJwt = Cookies.get("jwt");
+
+  const { data, isLoading: isVerifying, isError } = useVerifyAuth(myJwt) as any;
+
+  useEffect(() => {
+    if (data?.body.redirectURL) {
+      router.push(data.body.redirectURL);
+    }
+  }, [data]);
+
   const handleGoogleLogin = async () => {
+    let redirectPath = "";
     setLoading(true);
     setErrorMessage(null);
 
     try {
-      const response = await fetchRequest<null, { redirectUrl: string, statusCode: number }>("/oauth2/login", {
-        method: "GET",
-      });
+      const response = await fetchRequest<null, { redirectUrl: string; statusCode: number }>(
+        "/oauth2/login",
+        { method: "GET" }
+      );
 
       if (response.statusCode === 200 && response.body.redirectUrl) {
-        router.push(response.body.redirectUrl);
+        redirectPath = response.body.redirectUrl;
       } else {
         setErrorMessage("Erro ao redirecionar para login com Google.");
       }
@@ -40,6 +54,7 @@ const LoginPage = () => {
       );
     } finally {
       setLoading(false);
+      router.push(redirectPath);
     }
   };
 

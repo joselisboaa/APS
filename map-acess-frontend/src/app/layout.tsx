@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
+import QueryClientProviderComponent from "@/utils/layout"; 
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,8 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html className="h-full w-full" lang="pt-BR">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <QueryClientProviderComponent>
+      <html className="h-full w-full bg-color-pink" lang="pt-BR">
+        <body className={inter.className}>{children}</body>
+      </html>
+    </QueryClientProviderComponent>
   );
 }

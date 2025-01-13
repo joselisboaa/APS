@@ -8,13 +8,14 @@ interface fetchRequestOptions<T> extends Omit<RequestInit, "body"> {
 }
 
 interface FetchResponse<U> {
+    message: string;
     statusCode: number;
     body: U;
 }
 
 export default async function fetchRequest<T, U>(endpoint: string, options: fetchRequestOptions<T> = {}): Promise<FetchResponse<U>> {
     const { body, headers: optionHeaders, method, isMiddleware, ...otherOptions } = options;
-    const token = Cookies.get("session");
+    const token = Cookies.get("jwt");
     const headers = new Headers(optionHeaders);
     headers.append("Authorization", `Bearer ${token}`);
 

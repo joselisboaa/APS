@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button, Card, CardActions, CardContent, Typography, CircularProgress, Alert, Box } from "@mui/material";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import fetchRequest from "@/utils/fetchRequest";
 import Cookies from "js-cookie";
+
 
 interface UserGroup {
   id: string;
@@ -10,56 +13,54 @@ interface UserGroup {
 }
 
 export default function UserGroups() {
-  const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const token = Cookies.get("jwt") as string;
 
-  
-  useEffect(() => {
-    console.log(token)
-    async function fetchUserGroups() {
-      try {
-        setLoading(true);
-        const response = await fetchRequest<null, UserGroup[]>("/user-groups", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setUserGroups(response.body);
-      } catch (error) {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { data: userGroups, isLoading } = useQuery<UserGroup[]>(
+    "userGroups",
+    async () => {
+      const response = await fetchRequest<null, UserGroup[]>("/user-groups", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.body;
+    },
+    {
+      onError: (error: unknown) => {
         setErrorMessage(
           `Erro ao carregar grupos: ${error instanceof Error ? error.message : "Erro desconhecido"}`
         );
-      } finally {
-        setLoading(false);
-      }
+      },
     }
-    fetchUserGroups();
-  }, []);
+  );
 
-  async function handleDelete(id: string) {
-    try {
-      setLoading(true);
+  const deleteMutation = useMutation(
+    async (id: string) => {
       await fetchRequest<null, null>(`/user-groups/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      alert("grupo de usuário removido com sucesso!");
-      setUserGroups((prev) => prev.filter((group) => group.id !== id));
-    } catch (error) {
-      setErrorMessage(
-        `Erro ao excluir grupo: ${error instanceof Error ? error.message : "Erro desconhecido"}`
-      );
-    } finally {
-      setLoading(false);
+    },
+    {
+      onSuccess: (_, id) => {
+        queryClient.setQueryData<UserGroup[]>("userGroups", (old) =>
+          (old || []).filter((group) => group.id !== id)
+        );        
+      },
+      onError: (error: unknown) => {
+        setErrorMessage(
+          `Erro ao excluir grupo: ${error instanceof Error ? error.message : "Erro desconhecido"}`
+        );
+      },
     }
-  }
+  );
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -74,7 +75,7 @@ export default function UserGroups() {
       >
         Criar Novo Grupo
       </Button>
-      {loading && (
+      {isLoading && (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: 2 }}>
           <CircularProgress />
         </Box>
@@ -85,8 +86,12 @@ export default function UserGroups() {
         </Alert>
       )}
       <Box sx={{ display: "grid", gap: 2 }}>
-        {userGroups.map((group) => (
-          <Card key={group.id} variant="outlined" sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 2 }}>
+        {userGroups?.map((group) => (
+          <Card
+            key={group.id}
+            variant="outlined"
+            sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 2 }}
+          >
             <CardContent sx={{ flex: 1 }}>
               <Typography variant="h6" component="div">
                 {group.text}
@@ -104,9 +109,10 @@ export default function UserGroups() {
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => handleDelete(group.id)}
+                onClick={() => deleteMutation.mutate(group.id)}
+                disabled={deleteMutation.isLoading}
               >
-                Excluir
+                {deleteMutation.isLoading ? <CircularProgress size={20} /> : "Excluir"}
               </Button>
             </CardActions>
           </Card>

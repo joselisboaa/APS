@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/material": "^6.1.9",
+    "@tanstack/react-query": "^5.62.8",
+    "js-cookie": "^3.0.5",
     "next": "15.0.0",
-    "react": "19.0.0-rc-65a56d0e-20241020",
-    "react-dom": "19.0.0-rc-65a56d0e-20241020"
+    "react": "18",
+    "react-dom": "18",
+    "react-query": "^3.39.3"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
