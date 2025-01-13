@@ -11,12 +11,10 @@ import { verifyUserAuth } from "../middlewares/exceptions/authError";
 export const answerRouter = new Router();
 
 answerRouter.get("/",
-    verifyUserAuth(),
     MainController.findAll
 )
 
 answerRouter.post("/",
-    verifyUserAuth(),
     requestBodyValidator(answerSchema),
     questionErrorHandler.exists(true),
     answerErrorHandler.verifyRepeatedData(),
@@ -24,20 +22,17 @@ answerRouter.post("/",
 )
 
 answerRouter.get("/:id",
-    verifyUserAuth(),
     answerErrorHandler.exists(false, false),
     MainController.findById
 )
 
 answerRouter.delete("/:id",
-    verifyUserAuth(),
     answerErrorHandler.exists(false, false),
     answerErrorHandler.verifyEntityDependencies(),
     MainController.deleteById
 )
 
 answerRouter.put("/:id",
-    verifyUserAuth(),
     requestBodyValidator(answerSchema),
     answerErrorHandler.exists(false, false),
     questionErrorHandler.exists(true),

@@ -12,4 +12,10 @@ export class AuthController {
         
         res.redirect(process.env.FRONTEND_URL + "?code=" + response);
     }
+
+    static async verifyIfUserWasLoggedIn(req, res) {
+        const response = await authService.verifyIfUserWasLoggedIn(req);
+
+        res.send(response);
+    }
 }

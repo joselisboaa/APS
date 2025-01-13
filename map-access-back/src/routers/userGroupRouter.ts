@@ -13,26 +13,22 @@ userGroupRouter.get("/",
 )
 
 userGroupRouter.post("/",
-    verifyUserAuth(),
     requestBodyValidator(userGroupSchema),
     MainController.create
 )
 
 userGroupRouter.get("/:id",
-    verifyUserAuth(),
     userGroupErrorHandler.exists(false, false),
     MainController.findById
 )
 
 userGroupRouter.delete("/:id",
-    verifyUserAuth(),
     userGroupErrorHandler.exists(false, false),
     userGroupErrorHandler.verifyEntityDependencies(),
     MainController.deleteById
 )
 
 userGroupRouter.put("/:id",
-    verifyUserAuth(),
     requestBodyValidator(userGroupSchema),
     userGroupErrorHandler.exists(false, false),
     MainController.update

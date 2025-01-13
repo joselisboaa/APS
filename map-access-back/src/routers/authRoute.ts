@@ -17,3 +17,7 @@ authRouter.get("/login",
 authRouter.get("/login/callback",
     AuthController.callback
 )
+
+authRouter.get("/login/verify",
+    AuthController.verifyIfUserWasLoggedIn
+)

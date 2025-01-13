@@ -76,6 +76,33 @@ export class AuthService {
         return authorizeUrl;
     };
 
+
+    async verifyIfUserWasLoggedIn(req) {
+        const queryParam = req.query
+
+        const jwt_token = queryParam["jwt"];
+
+        const redirectData = {};
+
+        const verification = jwt.verify(jwt_token, jwtSecret, (error) => {
+            if (error) {
+                console.error('Erro na autenticação: ');
+
+                redirectData["redirectURL"] = frontendURL
+                redirectData["message"] = "Sessão expirada!";
+
+                return redirectData;
+            }
+
+            redirectData["redirectURL"] = frontendURL + "/home";
+            redirectData["message"] = "Usuário já autenticado!";
+
+            return redirectData;
+        });
+
+        return redirectData;
+    }
+
     async callback(req, res) {
         try {
             const qs = new URL(req.url, 'http://localhost:3000').searchParams;
