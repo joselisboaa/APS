@@ -15,66 +15,65 @@ export class AnswerService {
   }
 
   async verifyUniqueProperties(req): Promise<Answer | null> {
-    const body = req.body;
+  const body = req.body;
 
-    const query = {
-      where: {
-        text: body["text"]
-      }
+  const query = {
+    where: {
+      text: body["text"]
     }
+  }
 
     return prisma.answer.findFirst(query);
   }
 
   async findAll(req, res) {
     const queryParam = req.query;
-  
+    
     let filter = {
       text: {
-        startsWith: queryParam["text"]
+        startsWith: queryParam["text"] 
       }
     };
-  
+
     const questionId = queryParam["question-id"];
-    if (isNaN(questionId) === false) {
-      filter["questions"] = {
-        some: {
-          questionId: Number(queryParam["question-id"])
-        }
+    
+    if (!isNaN(questionId)) {
+      filter["question"] = {
+        id: Number(queryParam["question-id"]) 
       };
     }
-  
     const query = {
       skip: queryParam["pg"] == null ? 0 : (Number(queryParam["qt"]) * (Number(queryParam["pg"]) - 1)),
       take: queryParam["qt"] == null ? 100 : Number(queryParam["qt"]),
       where: filter,
       include: {
-        questions: {
-          include: {
-            question: true
-          }
-        }
+        question: true, 
+        orientations: true
       }
     };
-  
+
     const answers = await prisma.answer.findMany(query);
-  
     const formattedAnswers = answers.map(answer => ({
       id: answer.id,
       text: answer.text,
       other: answer.other,
-      questions: answer.questions.map(q => q.question)
+      question: answer.question, 
+      orientations: answer.orientations 
     }));
-  
+
     return formattedAnswers;
   }
-  
 
   async findById(id) {
     return prisma.answer.findUnique({
       where: {
-        id: id,
+      id: id,
       },
+    
+      include: {
+        question: true, 
+        orientations: true 
+      }
     });
   }
 
@@ -83,12 +82,14 @@ export class AnswerService {
       data: {
         text: data["text"],
         other: data["other"],
-        questions: {
-          create: data["question_ids"].map((questionId) => ({
-            question: {
-              connect: { id: questionId }
-            }
-          }))
+        question: {
+          connect: { id: data["question_id"] } 
+        },
+        orientations: {
+          create: data["orientations"].map((orientation) => ({
+          text: orientation.text,
+          value: orientation.value,
+        }))
         }
       }
     });
@@ -96,25 +97,30 @@ export class AnswerService {
 
   async update(req, res) {
     const data = {
-      "id": res.locals.answer["id"],
-      "text": req.body["text"],
-      "other": req.body["other"],
-      "question_ids": req.body["question_ids"]
+    "id": res.locals.answer["id"],
+    "text": req.body["text"],
+    "other": req.body["other"],
+    "question_id": req.body["question_id"],
+    "orientations": req.body["orientations"]
     };
 
     return prisma.answer.update({
-      where: {
-        id: data["id"],
+    where: {
+    id: data["id"],
+    },
+    data: {
+      text: data["text"],
+      other: data["other"],
+      question: {
+        connect: { id: data["question_id"] } 
       },
-      data: {
-        text: data["text"],
-        other: data["other"],
-        questions: {
-          set: data["question_ids"].map((questionId) => ({
-            questionId
-          }))
-        }
+      orientations: {
+        set: data["orientations"].map((orientation) => ({
+        text: orientation.text,
+        value: orientation.value
+      }))
       }
+    }
     });
   }
 

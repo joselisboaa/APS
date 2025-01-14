@@ -4,10 +4,10 @@ const prisma = new PrismaClient();
 
 export class QuestionService {
   async verifyEntityDependencies(req, res): Promise<Question | null> {
-    const questionId = Number(req.params["id"]);
+    const questionText = req.params["text"];
 
     const query = {
-      where: { id: questionId },
+      where: { text: questionText },
       include: { answers: true }
     }
 

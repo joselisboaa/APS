@@ -25,7 +25,7 @@ export const exists = function(isAttribute) {
 export const verifyRepeatedData = function () {
     return async function (req, res, next) {
         const questionInstance = new QuestionService();
-        const questionResponse = await questionInstance.verifyEntityDependencies(req, res);
+        const questionResponse = await questionInstance.verifyUniqueProperties(req);
 
         if (questionResponse !== null) {
             const error = new HttpsError(`A questão '${req.body["text"]}' já existe.`);
