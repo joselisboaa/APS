@@ -13,10 +13,10 @@ export const answerSchema = {
             "description": "true if it's a 'other answer' with a auxiliary text",
             "type": "boolean",
         },
-        "question_ids": {
+        "question_id": {
             "description": "question's foreign key",
-            "type": "array",
+            "type": "integer",
         }
     },
-    required: ["text", "other", "question_ids"]
+    required: ["text", "other", "question_id"]
 }

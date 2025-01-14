@@ -85,28 +85,21 @@ export class AnswerService {
         question: {
           connect: { id: data["question_id"] } 
         },
-        orientations: {
-          create: data["orientations"].map((orientation) => ({
-          text: orientation.text,
-          value: orientation.value,
-        }))
-        }
       }
     });
   }
 
   async update(req, res) {
     const data = {
-    "id": res.locals.answer["id"],
-    "text": req.body["text"],
-    "other": req.body["other"],
-    "question_id": req.body["question_id"],
-    "orientations": req.body["orientations"]
+      "id": res.locals.answer["id"],
+      "text": req.body["text"],
+      "other": req.body["other"],
+      "question_id": req.body["question_id"]
     };
 
     return prisma.answer.update({
     where: {
-    id: data["id"],
+      id: data["id"],
     },
     data: {
       text: data["text"],
@@ -114,12 +107,6 @@ export class AnswerService {
       question: {
         connect: { id: data["question_id"] } 
       },
-      orientations: {
-        set: data["orientations"].map((orientation) => ({
-        text: orientation.text,
-        value: orientation.value
-      }))
-      }
     }
     });
   }
