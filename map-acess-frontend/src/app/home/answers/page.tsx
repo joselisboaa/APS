@@ -25,9 +25,6 @@ export default function Answers() {
         setLoading(true);
         const response = await fetchRequest<null, Answer[]>("/answers", {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         });
         setAnswers(response.body);
       } catch (error) {
@@ -47,9 +44,6 @@ export default function Answers() {
       setLoading(true);
       await fetchRequest<null, null>(`/answers/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       enqueueSnackbar("Resposta removida com sucesso!", { variant: "success" });
@@ -72,7 +66,7 @@ export default function Answers() {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => router.push("/answers/new")}
+        onClick={() => router.push("/home/answers/new")}
         sx={{ marginBottom: 2 }}
       >
         Criar Nova Resposta
@@ -94,7 +88,7 @@ export default function Answers() {
               <Button
                 variant="contained"
                 color="success"
-                onClick={() => router.push(`/answers/edit/${answer.id}`)}
+                onClick={() => router.push(`/home/answers/edit/${answer.id}`)}
                 sx={{ marginRight: 1 }}
               >
                 Editar

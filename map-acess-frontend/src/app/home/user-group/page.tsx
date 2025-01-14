@@ -23,9 +23,6 @@ export default function UserGroups() {
     async () => {
       const response = await fetchRequest<null, UserGroup[]>("/user-groups", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       return response.body;
     },
@@ -45,9 +42,6 @@ export default function UserGroups() {
     async (id: string) => {
       await fetchRequest<null, null>(`/user-groups/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
     },
     {
@@ -76,7 +70,7 @@ export default function UserGroups() {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => router.push("/user-group/new")}
+        onClick={() => router.push("/home/user-group/new")}
         sx={{ marginBottom: 2 }}
       >
         Criar Novo Grupo
@@ -102,7 +96,7 @@ export default function UserGroups() {
               <Button
                 variant="contained"
                 color="success"
-                onClick={() => router.push(`/user-group/edit/${group.id}`)}
+                onClick={() => router.push(`/home/user-group/edit/${group.id}`)}
                 sx={{ marginRight: 1 }}
               >
                 Editar

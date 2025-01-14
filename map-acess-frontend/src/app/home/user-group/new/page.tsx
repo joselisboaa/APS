@@ -19,16 +19,13 @@ export default function CreateUserGroup() {
     async () => {
       await fetchRequest("/user-groups", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: { text },
       });
     },
     {
       onSuccess: () => {
         enqueueSnackbar("Grupo criado com sucesso!", { variant: "success" });
-        router.push("/user-group");
+        router.push("/home/user-group");
       },
       onError: (error: unknown) => {
         enqueueSnackbar(

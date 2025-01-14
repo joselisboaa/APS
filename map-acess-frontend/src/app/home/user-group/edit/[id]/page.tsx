@@ -21,9 +21,6 @@ export default function EditUserGroup() {
     async () => {
       const response = await fetchRequest<null, { text: string }>(`/user-groups/${id}`, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       return response.body;
     },
@@ -34,7 +31,7 @@ export default function EditUserGroup() {
           `Erro ao carregar o grupo: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
           { variant: "error" }
         );
-        router.push("/user-group");
+        router.push("/home/user-group");
       },
     }
   );
@@ -43,16 +40,13 @@ export default function EditUserGroup() {
     async () => {
       await fetchRequest(`/user-groups/${id}`, {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: { text },
       });
     },
     {
       onSuccess: () => {
         enqueueSnackbar("Grupo atualizado com sucesso!", { variant: "success" });
-        router.push("/user-group");
+        router.push("/home/user-group");
       },
       onError: (error: unknown) => {
         enqueueSnackbar(

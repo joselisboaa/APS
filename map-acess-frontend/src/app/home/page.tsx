@@ -7,11 +7,11 @@ export default function Home() {
   const router = useRouter();
 
   const navigateToUserGroups = () => {
-    router.push("/user-group");
+    router.push("/home/user-group");
   };
 
   const navigateToAnswers = () => {
-    router.push("/answers");
+    router.push("/home/answers");
   };
 
   return (

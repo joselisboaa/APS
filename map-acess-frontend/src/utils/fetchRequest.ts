@@ -38,7 +38,6 @@ export default async function fetchRequest<T, U>(endpoint: string, options: fetc
         }
 
         if (!response.ok) {
-            // Lança um erro com a mensagem retornada pelo backend, se disponível
             const errorMessage = responseBody?.message || "Erro desconhecido.";
             throw new Error(errorMessage);
         }

@@ -17,7 +17,6 @@ export default function RootLayout({
 }) {
   return (
     <QueryClientProviderComponent>
-      
       <html className="h-full w-full bg-color-pink" lang="pt-BR">
         <body className={inter.className}>
           <NotistackProvider>
